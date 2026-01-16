@@ -83,3 +83,11 @@ button:hover {
     text-align: center;
 }
 
+select {
+    display: block;
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 15px;
+    font-size: 1rem;
+}
+
