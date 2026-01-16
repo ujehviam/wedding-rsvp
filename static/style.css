@@ -1,8 +1,71 @@
 body {
-    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  font-family: Arial, sans-serif;
+  background-image: url("../static/images/wedding-bg.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
-    /* Background image */
-    background-image: url("/static/images/wedding-bg.jpg");
+/* Form container */
+form {
+  background: rgba(255, 255, 255, 0.9);
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+
+/* Inputs */
+input {
+  display: block;
+  margin-bottom: 15px;
+  padding: 10px;
+  width: 260px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+/* Button */
+button {
+  width: 100%;
+  padding: 10px;
+  border: none;
+  background: #b88b4a;
+  color: white;
+  font-size: 16px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #9f7538;
+}
+
+/* Flash messages */
+.flash {
+  padding: 10px;
+  margin-bottom: 15px;
+  border-radius: 5px;
+  text-align: center;
+}
+
+.flash.error {
+  background: #ffdddd;
+}
+
+.flash.info {
+  background: #ddffdd;
+}
+
+.thank-you-page {
+    margin: 0;
+    height: 100vh;
+    font-family: Arial, sans-serif;
+
+    background-image: url("/static/images/thankyou-bg.jpg");
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -10,74 +73,13 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
-    margin: 0;
 }
 
-body::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: rgba(255, 255, 255, 0.75);
-    z-index: -1;
-}
-
-.container {
-    background: white;
-    padding: 2.5rem;
+.thank-you-page h2 {
+    background: rgba(255, 255, 255, 0.85);
+    padding: 20px 30px;
     border-radius: 12px;
-    width: 100%;
-    max-width: 420px;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    color: #333;
     text-align: center;
 }
-
-h1 {
-    margin-bottom: 0.5rem;
-}
-
-p {
-    color: #666;
-    margin-bottom: 1.5rem;
-}
-
-
-input {
-    width: 100%;
-    padding: 0.8rem;
-    margin-bottom: 1.2rem; /* ⬅ creates space between inputs */
-    border-radius: 8px;
-    border: 1px solid #ccc;
-    font-size: 1rem;
-}
-
-
-input:focus {
-    outline: none;
-    border-color: #d4af37;
-    box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.2);
-}
-
-button {
-    width: 100%;
-    padding: 0.9rem;
-    background-color: #d4af37;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    font-size: 1rem;
-    cursor: pointer;
-    font-weight: bold;
-}
-
-button:hover {
-    background-color: #c29d2f;
-}
-
-footer {
-    margin-top: 1rem;
-    font-size: 0.85rem;
-    color: #aaa;
-}
-
 

@@ -1,110 +1,86 @@
-from flask import Flask, render_template, request, redirect, url_for, send_file, flash
+from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
-from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user
-from werkzeug.security import generate_password_hash, check_password_hash
 from dotenv import load_dotenv
 import os
-import csv
 import io
+import csv
+from flask import send_file
 
 load_dotenv()
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = os.getenv("SECRET_KEY")
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("DATABASE_URL")
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config["SECRET_KEY"] = os.getenv("SECRET_KEY", "dev-secret")
+app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv(
+    "DATABASE_URL", "sqlite:///app.db"
+)
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db = SQLAlchemy(app)
 
-# Flask-Login setup
-login_manager = LoginManager()
-login_manager.init_app(app)
-login_manager.login_view = "login"
-
-# -------------------- MODELS --------------------
-
-class User(UserMixin, db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(80), unique=True, nullable=False)
-    password_hash = db.Column(db.String(255), nullable=False)
+# -------------------- MODEL --------------------
 
 class Guest(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
-
-@login_manager.user_loader
-def load_user(user_id):
-    return User.query.get(int(user_id))
+    email = db.Column(db.String(120), unique=True, nullable=False)
 
 # -------------------- ROUTES --------------------
 
 @app.route("/", methods=["GET", "POST"])
 def index():
     if request.method == "POST":
-        name = request.form.get("name")
+        name = request.form.get("name", "").strip()
+        email = request.form.get("email", "").strip().lower()
 
-        if name:
-            db.session.add(Guest(name=name))
-            db.session.commit()
-            return redirect(url_for("success"))
+        if not name or not email:
+            flash("All fields are required", "error")
+            return redirect(url_for("index"))
+
+        existing_guest = Guest.query.filter_by(email=email).first()
+        if existing_guest:
+            flash(
+                "You have already indicated your attendance. Thank you 💍",
+                "info"
+            )
+            return redirect(url_for("index"))
+
+        guest = Guest(name=name, email=email)
+        db.session.add(guest)
+        db.session.commit()
+
+        return redirect(url_for("success"))
 
     return render_template("index.html")
+
 
 @app.route("/success")
 def success():
     return render_template("success.html")
 
-# -------- ADMIN LOGIN --------
-
-@app.route("/login", methods=["GET", "POST"])
-def login():
-    if request.method == "POST":
-        username = request.form.get("username")
-        password = request.form.get("password")
-
-        user = User.query.filter_by(username=username).first()
-
-        if user and check_password_hash(user.password_hash, password):
-            login_user(user)
-            return redirect(url_for("download"))
-
-        flash("Invalid credentials", "error")
-
-    return render_template("login.html")
-
-@app.route("/logout")
-@login_required
-def logout():
-    logout_user()
-    return redirect(url_for("login"))
-
-# -------- PROTECTED DOWNLOAD --------
 
 @app.route("/download")
-@login_required
 def download():
-    guests = Guest.query.all()
+    guests = Guest.query.order_by(Guest.id.asc()).all()
 
     output = io.StringIO()
     writer = csv.writer(output)
-    writer.writerow(["ID", "Name"])
+    writer.writerow(["Name", "Email"])
 
     for guest in guests:
-        writer.writerow([guest.id, guest.name])
+        writer.writerow([guest.name, guest.email])
 
     output.seek(0)
 
-    response = send_file(
+    return send_file(
         io.BytesIO(output.getvalue().encode()),
         mimetype="text/csv",
         as_attachment=True,
-        download_name="guest_list.csv"
+        download_name="wedding_guests.csv"
     )
 
-    response.headers["Cache-Control"] = "no-store"
-    return response
 
-# -------------------- INIT --------------------
+
+# -------------------- START APP --------------------
 
 if __name__ == "__main__":
     with app.app_context():

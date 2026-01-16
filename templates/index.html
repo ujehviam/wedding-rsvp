@@ -1,41 +1,24 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Wedding RSVP</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-
+  <title>Wedding RSVP</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
 
-    <div class="container">
-        <h1>You’re Invited 🎉</h1>
-        <p>Please confirm your attendance</p>
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    {% for category, message in messages %}
+      <p class="flash {{ category }}">{{ message }}</p>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
 
-        <form method="POST">
-            <input 
-                type="text" 
-                name="name" 
-                placeholder="Your full name" 
-                required
-            >
-
-            <input 
-                type="email" 
-                name="email" 
-                placeholder="Your email address" 
-                required
-            >
-
-            <button type="submit">Confirm Attendance</button>
-        </form>
-
-        <footer>
-            We can’t wait to celebrate with you 💍
-        </footer>
-    </div>
+<form method="POST">
+  <input type="text" name="name" placeholder="Your name" required>
+  <input type="email" name="email" placeholder="Your email" required>
+  <button type="submit">Submit</button>
+</form>
 
 </body>
 </html>
