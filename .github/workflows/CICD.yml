@@ -1,7 +1,7 @@
-name: contineous deployment
-on:
-  push:
-    branches: master
-jobs:
-  build:
+# name: contineous deployment
+# on:
+#   push:
+#     branches: master
+# jobs:
+#   build:
   
