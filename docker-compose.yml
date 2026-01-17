@@ -1,0 +1,39 @@
+services:
+    postgresDB:
+        image: postgres:16
+        container_name: wedding_db2
+        ports:
+            - "5440:5432"
+        networks:
+            - rspvnetwork
+        environment:
+            POSTGRES_USER: wedding_user
+            POSTGRES_PASSWORD: StrongPass123!
+            POSTGRES_DB: weddingrspvDB
+        volumes:
+            - RSPVDBvolume:/var/lib/postgresql/data
+
+
+
+    RSPVAPP:
+        depends_on: 
+            - postgresDB
+        build:
+            context: .
+            dockerfile: Dockerfile
+        image: weddingrspvimage:v2
+        container_name: weddingrspvcontainer2
+        networks:
+            - rspvnetwork
+        ports:
+            - "5441:5000"
+        env_file:
+            - .env
+volumes:  
+    RSPVDBvolume:
+networks:
+    rspvnetwork:
+        driver: bridge
+
+        
+
