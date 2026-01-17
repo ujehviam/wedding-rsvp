@@ -1,0 +1,7 @@
+name: contineous deployment
+on:
+  push:
+    branches: master
+jobs:
+  build:
+  
