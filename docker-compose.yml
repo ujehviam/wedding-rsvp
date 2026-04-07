@@ -29,8 +29,10 @@ services:
             - "5441:5000"
         env_file:
             - .env
+        volumes:
+            - /home/mayaki/Desktop/wedding-rsvp:/app  
 volumes:  
-    RSPVDBvolume:
+       RSPVDBvolume:
 networks:
     rspvnetwork:
         driver: bridge
