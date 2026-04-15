@@ -33,19 +33,20 @@ def index():
             flash("All fields are required", "error")
             return redirect(url_for("index"))
 
-        if Guest.query.filter_by(email=email).first():
-            flash(
-                "You have already indicated your attendance. Thank you 💍",
-                "info"
-            )
-            return redirect(url_for("index"))
+        existing_guest = Guest.query.filter_by(email=email).first()
+
+        if existing_guest:
+            return redirect(url_for(
+                "success",
+                name=existing_guest.name,
+                category=existing_guest.category
+            ))
 
         guest = Guest(name=name, email=email, category=category)
         db.session.add(guest)
         db.session.commit()
 
-        # Redirect with name
-        return redirect(url_for("success", name=name))
+        return redirect(url_for("success", name=name, category=category))
 
     return render_template("index.html")
 
@@ -53,44 +54,68 @@ def index():
 @app.route("/success")
 def success():
     name = request.args.get("name")
-    return render_template("success.html", name=name)
+    category = request.args.get("category")
+    return render_template("success.html", name=name, category=category)
 
 
-# -------------------- ACCESS CARD GENERATION --------------------
+# -------------------- ACCESS CARD --------------------
 
 @app.route("/card/<name>")
 def generate_card(name):
-    name = name.upper()
+    try:
+        category = request.args.get("category", "")
 
-    # Load base image (your access card)
-    img_path = os.path.join("static", "images", "access-card.jpg")
-    image = Image.open(img_path)
+        name = name.upper()
+        category = category.upper()
 
-    draw = ImageDraw.Draw(image)
+        # Load image
+        img_path = os.path.join("static", "images", "access-card.jpg")
+        image = Image.open(img_path)
 
-    # Load font (make sure this file exists)
-    font_path = os.path.join("static", "fonts", "arial.ttf")
-    font = ImageFont.truetype(font_path, 50)
+        draw = ImageDraw.Draw(image)
 
-    # Get image size
-    image_width, image_height = image.size
+        # Load font
+        font_path = os.path.join("static", "fonts", "Zikketica.ttf")
 
-    # Calculate text width for centering
-    bbox = draw.textbbox((0, 0), name, font=font)
-    text_width = bbox[2] - bbox[0]
+        try:
+            name_font = ImageFont.truetype(font_path, 30)
+            category_font = ImageFont.truetype(font_path, 20)
+        except:
+            name_font = ImageFont.load_default()
+            category_font = ImageFont.load_default()
 
-    # Center horizontally, adjust vertical position manually
-    x = (image_width - text_width) / 2
-    y = int(image_height * 0.45)  # adjust this to fit the red bar
+        image_width, image_height = image.size
 
-    draw.text((x, y), name, fill="white", font=font)
+        # -------- NAME --------
+        name_bbox = draw.textbbox((0, 0), name, font=name_font)
+        name_width = name_bbox[2] - name_bbox[0]
+        name_height = name_bbox[3] - name_bbox[1]
 
-    # Save to memory
-    img_io = io.BytesIO()
-    image.save(img_io, "PNG")
-    img_io.seek(0)
+        x_name = (image_width - name_width) / 2
+        y_name = int(image_height * 0.68)
 
-    return send_file(img_io, mimetype="image/png")
+        draw.text((x_name, y_name), name, fill="#3b2f2f", font=name_font)
+
+        # -------- CATEGORY (BELOW NAME) --------
+        cat_bbox = draw.textbbox((0, 0), category, font=category_font)
+        cat_width = cat_bbox[2] - cat_bbox[0]
+        cat_height = cat_bbox[3] - cat_bbox[1]
+
+        x_cat = (image_width - cat_width) / 2
+        y_cat = y_name + name_height + 10  # spacing below name
+
+        draw.text((x_cat, y_cat), category, fill="#3b2f2f", font=category_font)
+
+        # Save image
+        img_io = io.BytesIO()
+        image.save(img_io, "PNG")
+        img_io.seek(0)
+
+        return send_file(img_io, mimetype="image/png")
+
+    except Exception as e:
+        print("ERROR generating card:", e)
+        return f"Error generating card: {e}", 500
 
 
 # -------------------- DOWNLOAD CSV --------------------
