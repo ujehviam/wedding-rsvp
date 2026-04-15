@@ -102,7 +102,7 @@ def generate_card(name):
         cat_height = cat_bbox[3] - cat_bbox[1]
 
         x_cat = (image_width - cat_width) / 2
-        y_cat = y_name + name_height + 10  # spacing below name
+        y_cat = y_name + name_height + 20  # spacing below name
 
         draw.text((x_cat, y_cat), category, fill="#3b2f2f", font=category_font)
 
