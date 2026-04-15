@@ -1,10 +1,20 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Thank You</title>
+    <title>Access Card</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body class="thank-you-page">
-    <h2>Thank you for confirming your attendance ❤️</h2>
+
+    <h2>Your Access Card 🎟️</h2>
+
+    <img src="{{ url_for('generate_card', name=name) }}" alt="Access Card" style="width: 300px; border-radius: 10px;">
+
+    <br><br>
+
+    <a href="{{ url_for('generate_card', name=name) }}" download="access-card.png">
+        <button>Download Card</button>
+    </a>
+
 </body>
 </html>

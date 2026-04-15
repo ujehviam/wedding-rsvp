@@ -6,6 +6,8 @@ import io
 import csv
 import os
 
+from PIL import Image, ImageDraw, ImageFont
+
 from db import db, init_db
 from models import Guest
 
@@ -42,13 +44,56 @@ def index():
         db.session.add(guest)
         db.session.commit()
 
-        return redirect(url_for("success"))
+        # Redirect with name
+        return redirect(url_for("success", name=name))
 
     return render_template("index.html")
 
+
 @app.route("/success")
 def success():
-    return render_template("success.html")
+    name = request.args.get("name")
+    return render_template("success.html", name=name)
+
+
+# -------------------- ACCESS CARD GENERATION --------------------
+
+@app.route("/card/<name>")
+def generate_card(name):
+    name = name.upper()
+
+    # Load base image (your access card)
+    img_path = os.path.join("static", "images", "access-card.jpg")
+    image = Image.open(img_path)
+
+    draw = ImageDraw.Draw(image)
+
+    # Load font (make sure this file exists)
+    font_path = os.path.join("static", "fonts", "arial.ttf")
+    font = ImageFont.truetype(font_path, 50)
+
+    # Get image size
+    image_width, image_height = image.size
+
+    # Calculate text width for centering
+    bbox = draw.textbbox((0, 0), name, font=font)
+    text_width = bbox[2] - bbox[0]
+
+    # Center horizontally, adjust vertical position manually
+    x = (image_width - text_width) / 2
+    y = int(image_height * 0.45)  # adjust this to fit the red bar
+
+    draw.text((x, y), name, fill="white", font=font)
+
+    # Save to memory
+    img_io = io.BytesIO()
+    image.save(img_io, "PNG")
+    img_io.seek(0)
+
+    return send_file(img_io, mimetype="image/png")
+
+
+# -------------------- DOWNLOAD CSV --------------------
 
 @app.route("/download")
 def download():
@@ -69,6 +114,7 @@ def download():
         as_attachment=True,
         download_name="wedding_guests.csv"
     )
+
 
 # -------------------- ENTRY POINT --------------------
 
