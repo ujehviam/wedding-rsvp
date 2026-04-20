@@ -1,3 +1,4 @@
+/* RESET + BASE */
 body {
   font-family: Arial, sans-serif;
   position: relative;
@@ -9,56 +10,67 @@ body {
   justify-content: center;
 
   overflow: hidden;
+  padding: 20px;
+  box-sizing: border-box;
 }
 
-/* Background layer */
+/* BACKGROUND */
 body::before {
   content: "";
   position: absolute;
   inset: 0;
   background-image: url("../static/images/wedding-bg.jpg");
-  background-size: cover;              /* ✅ full screen */
-  background-position: center 32%;    /* ✅ keep head visible */
+  background-size: cover;
+  background-position: center 32%;
   background-repeat: no-repeat;
-  filter: blur(2px) brightness(0.9);   /* ✅ softer blur */
+  filter: blur(2px) brightness(0.9);
   z-index: -1;
 }
 
-/* Form container */
+/* FORM CONTAINER */
 form {
   background: rgba(255, 255, 255, 0.9);
   padding: 30px;
-  border-radius: 10px;
+  border-radius: 12px;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+
+  width: 90%;
+  max-width: 420px;
 }
 
-/* Inputs */
-input {
-  display: block;
-  margin-bottom: 15px;
-  padding: 10px;
-  width: 260px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-}
-
-/* Button */
+/* INPUTS + SELECT + BUTTON */
+input,
+select,
 button {
+  display: block;
   width: 100%;
-  padding: 10px;
+  padding: 12px;
+  margin-bottom: 15px;
+  font-size: 16px;
+  border-radius: 6px;
+  box-sizing: border-box;
+}
+
+/* INPUT + SELECT STYLE */
+input,
+select {
+  border: 1px solid #ccc;
+}
+
+/* BUTTON */
+button {
   border: none;
   background: #b88b4a;
   color: white;
-  font-size: 16px;
-  border-radius: 5px;
   cursor: pointer;
+  transition: background 0.3s ease;
 }
 
 button:hover {
   background: #9f7538;
 }
 
-/* Flash messages */
+/* FLASH MESSAGES */
 .flash {
   padding: 10px;
   margin-bottom: 15px;
@@ -79,14 +91,15 @@ button:hover {
   position: relative;
   margin: 0;
   height: 100vh;
-  font-family: Arial, sans-serif;
+
   display: flex;
   justify-content: center;
   align-items: center;
+
   overflow: hidden;
 }
 
-/* Background for thank-you page */
+/* THANK YOU BACKGROUND */
 .thank-you-page::before {
   content: "";
   position: absolute;
@@ -99,6 +112,7 @@ button:hover {
   z-index: -1;
 }
 
+/* THANK YOU TEXT */
 .thank-you-page h2 {
   background: rgba(255, 255, 255, 0.85);
   padding: 20px 30px;
@@ -107,27 +121,39 @@ button:hover {
   text-align: center;
 }
 
-/* Select */
-select {
-  display: block;
-  width: 100%;
-  padding: 8px;
-  margin-bottom: 15px;
-  font-size: 1rem;
-}
-
+/* CARD CONTAINER */
 .card-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;   /* ✅ centers horizontally */
-    justify-content: center;
-    gap: 20px;
-    text-align: center;    /* ✅ centers text like h2 */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  text-align: center;
+  padding: 20px;
 }
 
 .card-container img {
-    display: block;
-    margin: 0 auto;        /* ✅ ensures perfect centering */
-    width: 300px;
-    border-radius: 10px;
+  width: 95%;
+  max-width: 400px;
+  height: auto;
+  border-radius: 10px;
+}
+
+/* MOBILE OPTIMIZATION */
+@media (max-width: 600px) {
+  body {
+    padding: 10px;
+  }
+
+  form {
+    padding: 20px;
+    width: 95%;
+  }
+
+  input,
+  select,
+  button {
+    font-size: 18px;
+    padding: 14px;
+  }
 }

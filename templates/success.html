@@ -2,20 +2,21 @@
 <html>
 <head>
     <title>Your Access Card</title>
+
+    <!-- 🔥 THIS IS THE FIX -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body class="thank-you-page">
 
     <div class="card-container">
 
-        <!-- Title -->
         <h2>Your Access Card 🎟️</h2>
 
-        <!-- Image -->
         <img src="{{ url_for('generate_card', name=name, category=category) }}" 
              alt="Access Card">
 
-        <!-- Download Button -->
         <a href="{{ url_for('generate_card', name=name, category=category) }}" download="access-card.png">
             <button>Download Card</button>
         </a>
