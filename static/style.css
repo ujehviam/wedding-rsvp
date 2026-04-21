@@ -6,10 +6,10 @@ body {
   margin: 0;
 
   display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
 
-  overflow: hidden;
+  overflow-y: auto;
   padding: 20px;
   box-sizing: border-box;
 }
@@ -51,7 +51,7 @@ button {
   box-sizing: border-box;
 }
 
-/* INPUT + SELECT STYLE */
+/* INPUT + SELECT */
 input,
 select {
   border: 1px solid #ccc;
@@ -90,13 +90,15 @@ button:hover {
 .thank-you-page {
   position: relative;
   margin: 0;
-  height: 100vh;
+  min-height: 100vh;
 
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start; /* ✅ important for mobile */
 
-  overflow: hidden;
+  overflow-y: auto; /* ✅ allow scrolling */
+  padding: 20px;
+  box-sizing: border-box;
 }
 
 /* THANK YOU BACKGROUND */
@@ -130,6 +132,7 @@ button:hover {
   gap: 20px;
   text-align: center;
   padding: 20px;
+  padding-bottom: 40px; /* ✅ ensures scroll space for button */
 }
 
 .card-container img {
@@ -143,6 +146,7 @@ button:hover {
 @media (max-width: 600px) {
   body {
     padding: 10px;
+    align-items: flex-start; /* ✅ prevents cutoff */
   }
 
   form {
