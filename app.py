@@ -7,6 +7,7 @@ import csv
 import os
 
 from PIL import Image, ImageDraw, ImageFont
+from sqlalchemy.exc import IntegrityError
 
 from db import db, init_db
 from models import Guest
@@ -29,22 +30,26 @@ def index():
         email = request.form.get("email", "").strip().lower()
         category = request.form.get("category", "").strip()
 
+        # ---- VALIDATION ----
         if not name or not email or not category:
             flash("All fields are required", "error")
             return redirect(url_for("index"))
 
+        # ---- CHECK DUPLICATE EMAIL ----
         existing_guest = Guest.query.filter_by(email=email).first()
-
         if existing_guest:
-            return redirect(url_for(
-                "success",
-                name=existing_guest.name,
-                category=existing_guest.category
-            ))
+            flash("This email has already been used. Please use another.", "error")
+            return redirect(url_for("index"))
 
-        guest = Guest(name=name, email=email, category=category)
-        db.session.add(guest)
-        db.session.commit()
+        # ---- SAVE TO DATABASE ----
+        try:
+            guest = Guest(name=name, email=email, category=category)
+            db.session.add(guest)
+            db.session.commit()
+        except IntegrityError:
+            db.session.rollback()
+            flash("This email has already been used.", "error")
+            return redirect(url_for("index"))
 
         return redirect(url_for("success", name=name, category=category))
 
@@ -96,17 +101,16 @@ def generate_card(name):
 
         draw.text((x_name, y_name), name, fill="#3b2f2f", font=name_font)
 
-        # -------- CATEGORY (BELOW NAME) --------
+        # -------- CATEGORY --------
         cat_bbox = draw.textbbox((0, 0), category, font=category_font)
         cat_width = cat_bbox[2] - cat_bbox[0]
-        cat_height = cat_bbox[3] - cat_bbox[1]
 
         x_cat = (image_width - cat_width) / 2
-        y_cat = y_name + name_height + 20  # spacing below name
+        y_cat = y_name + name_height + 20
 
         draw.text((x_cat, y_cat), category, fill="#3b2f2f", font=category_font)
 
-        # Save image
+        # Save image to memory
         img_io = io.BytesIO()
         image.save(img_io, "PNG")
         img_io.seek(0)
@@ -115,7 +119,7 @@ def generate_card(name):
 
     except Exception as e:
         print("ERROR generating card:", e)
-        return f"Error generating card: {e}", 500
+        return "Error generating card", 500
 
 
 # -------------------- DOWNLOAD CSV --------------------
@@ -126,6 +130,7 @@ def download():
 
     output = io.StringIO()
     writer = csv.writer(output)
+
     writer.writerow(["Name", "Email", "Category"])
 
     for guest in guests:
